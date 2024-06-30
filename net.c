@@ -96,8 +96,8 @@ int net_device_output(struct net_device* dev, uint16_t type,
 }
 
 // Catch some inputs from a network device
-int net_device_input(uint16_t type, const uint8_t* data, size_t len,
-                     struct net_device* dev) {
+int net_input_handler(uint16_t type, const uint8_t* data, size_t len,
+                      struct net_device* dev) {
     debugf("dev=%s, type=0x%04x, len=%zu", dev->name, type, len);
     debugdump(data, len);
     return 0;
