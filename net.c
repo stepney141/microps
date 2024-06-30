@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+#include "intr.h"
 #include "platform.h"
 #include "util.h"
 
@@ -105,7 +106,10 @@ int net_device_input(uint16_t type, const uint8_t* data, size_t len,
 // Run the protocol stack
 int net_run(void) {
     struct net_device* dev;
-
+    if (intr_run() == -1) {
+        errorf("intr_run() failure");
+        return -1;
+    }
     debugf("open all devices...");
     for (dev = devices; dev; dev = dev->next) {
         net_device_open(dev);
@@ -117,16 +121,20 @@ int net_run(void) {
 // Shutdown the protocol stack
 void net_shutdown(void) {
     struct net_device* dev;
-
     debugf("close all devices...");
     for (dev = devices; dev; dev = dev->next) {
         net_device_close(dev);
     }
+    intr_shutdown();
     debugf("shutting down");
 }
 
 // Initialize the network stack
 int net_init(void) {
+    if (intr_init() == -1) {
+        errorf("intr_init() failure");
+        return -1;
+    }
     infof("initialized");
     return 0;
 }
